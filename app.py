@@ -11,12 +11,20 @@ from visualization import plot_yearly_growth, plot_solar_vs_wind, plot_regional_
 from evaluation import evaluate_forecast, evaluate_dual_forecasts
 
 # Application page configuration
-st.set_page_config(page_title="Saudi Renewable Energy AI", layout="wide")
+st.set_page_config(
+    page_title="Saudi Renewable Energy AI",
+    layout="wide"
+)
+
+st.markdown("""
+<style>
+[data-baseweb="popover"] li:first-child {
+    display: none;
+}
+</style>
+""", unsafe_allow_html=True)
 
 st.title("Saudi Arabia Renewable Energy Forecasting Platform")
-st.subheader("An interactive AI-driven MLOps dashboard analyzing and forecasting Saudi Arabia's Vision 2030 renewable energy targets.")
-
-st.write("---")
 # Initialize safe fallback variables to prevent NameError during tight filtering
 gap_val = 0.0
 has_installed_forecast = False
