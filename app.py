@@ -65,6 +65,11 @@ selected_years = st.sidebar.multiselect(
     year_options,
     default=["All Years"]
 )
+if "All Cities" in selected_cities and len(selected_cities) > 1:
+    selected_cities = [city for city in selected_cities if city != "All Cities"]
+
+if "All Years" in selected_years and len(selected_years) > 1:
+    selected_years = [year for year in selected_years if year != "All Years"]
 # Apply User Filters dynamically to the dataframe
 df_filtered = df_merged.copy()
 d1_filtered = d1_cleaned.copy()
