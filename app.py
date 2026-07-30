@@ -43,34 +43,49 @@ except Exception as e:
 st.sidebar.header("🕹️ Interactive User Controls")
 st.sidebar.write("Select filters to customize the data preview and KPIs:")
 
-# Get unique sorted cities and years directly from your real dataset
-available_cities = sorted(df_merged['City'].dropna().unique().tolist())
-available_years = sorted(df_merged['Year'].dropna().unique().tolist())
 
-# Add an "All Cities" and "All Years" option for flexibility
-city_options = available_cities
-year_options = [int(y) for y in available_years]
+# Get unique cities and years
+available_cities = sorted(df_merged["City"].dropna().unique().tolist())
+available_years = sorted(
+    df_merged["Year"].dropna().astype(int).unique().tolist()
+)
 
-# Convert years to integers for clean display
-year_options = [int(y) for y in available_years]
+# Add one clear All option
+city_options = ["All Cities"] + available_cities
+year_options = ["All Years"] + available_years
 
-# Using multiselect instead of selectbox for multiple selections
-selected_cities = st.sidebar.multiselect("📍 Select City / Region:", city_options, default=city_options)
-selected_years = st.sidebar.multiselect("📅 Select Target Years:", year_options, default=year_options)
+selected_cities = st.sidebar.multiselect(
+    "📍 Select City / Region:",
+    city_options,
+    default=["All Cities"]
+)
 
+selected_years = st.sidebar.multiselect(
+    "📅 Select Target Years:",
+    year_options,
+    default=["All Years"]
+)
 # Apply User Filters dynamically to the dataframe
 df_filtered = df_merged.copy()
 d1_filtered = d1_cleaned.copy()
 
-# Filter by the list of selected cities (if the user unchecks everything, it clears the filter)
-if selected_cities:
-    df_filtered = df_filtered[df_filtered['City'].isin(selected_cities)]
-    d1_filtered = d1_filtered[d1_filtered['City'].isin(selected_cities)]
+# Apply city filter only when All Cities is not selected
+if selected_cities and "All Cities" not in selected_cities:
+    df_filtered = df_filtered[
+        df_filtered["City"].isin(selected_cities)
+    ]
+    d1_filtered = d1_filtered[
+        d1_filtered["City"].isin(selected_cities)
+    ]
 
-# Filter by the list of selected years
-if selected_years:
-    df_filtered = df_filtered[df_filtered['Year'].isin(selected_years)]
-    d1_filtered = d1_filtered[d1_filtered['Year'].isin(selected_years)]
+# Apply year filter only when All Years is not selected
+if selected_years and "All Years" not in selected_years:
+    df_filtered = df_filtered[
+        df_filtered["Year"].astype(int).isin(selected_years)
+    ]
+    d1_filtered = d1_filtered[
+        d1_filtered["Year"].astype(int).isin(selected_years)
+    ]
 
 # Calculate real KPI metrics dynamically based on USER SELECTION
 total_projects = len(df_filtered)
@@ -91,10 +106,22 @@ st.write("---")
 # Grid Layout for the Core Team Analytics & Global AI Forecasts
 st.subheader("📊 System Visualizations & AI Forecasts")
 # Safely format multiple selections into a readable string separating them with commas
-city_display = ", ".join(selected_cities) if selected_cities else "All Cities"
-year_display = ", ".join([str(y) for y in selected_years]) if selected_years else "All Years"
+city_display = (
+    "All Cities"
+    if not selected_cities or "All Cities" in selected_cities
+    else ", ".join(selected_cities)
+)
 
-st.write(f"Showing global system models alongside filtered real-time statistics for **{city_display}** in **{year_display}**.")
+year_display = (
+    "All Years"
+    if not selected_years or "All Years" in selected_years
+    else ", ".join(map(str, selected_years))
+)
+
+st.write(
+    f"Displaying renewable energy statistics and AI forecasts "
+    f"for **{city_display}** across **{year_display}**."
+)
 
 # Making sure that there is data after filtering
 if total_projects > 0:
